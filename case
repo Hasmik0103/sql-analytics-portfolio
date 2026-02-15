@@ -1,0 +1,195 @@
+SELECT * FROM public.customers LIMIT 10;
+
+SELECT * FROM public.employees LIMIT 10;
+
+SELECT * FROM public.orders LIMIT 10;
+
+SELECT * FROM public.products LIMIT 10;
+
+SELECT * FROM public.sales LIMIT 10;
+ALTER TABLE employees
+ADD CONSTRAINT uq_employees_email UNIQUE (email);
+ALTER TABLE employees
+ALTER COLUMN phone_number SET NOT NULL;
+ALTER TABLE products
+ADD CONSTRAINT chk_products_price CHECK (price >= 0);
+ALTER TABLE sales
+ADD CONSTRAINT chk_sales_total CHECK (total_sales >= 0);
+ALTER TABLE sales
+ADD COLUMN sales_channel TEXT;
+ALTER TABLE sales
+ADD CONSTRAINT chk_sales_channel
+CHECK (sales_channel IN ('online', 'store'));
+UPDATE sales
+SET sales_channel = 'online'
+WHERE transaction_id % 2 = 0;
+CREATE INDEX idx_sales_product_id
+ON sales (product_id);
+CREATE INDEX idx_sales_customer_id
+ON sales (customer_id);
+CREATE INDEX idx_products_category
+ON products (category);
+EXPLAIN
+SELECT
+  product_id,
+  SUM(total_sales) AS total_revenue
+FROM sales
+GROUP BY product_id;
+SELECT *
+FROM sales;
+SELECT
+  transaction_id,
+  product_id,
+  total_sales
+FROM sales;
+SELECT
+  product_id,
+  SUM(total_sales) AS total_revenue
+FROM sales
+GROUP BY product_id
+ORDER BY total_revenue DESC
+LIMIT 5;
+EXPLAIN
+SELECT DISTINCT
+  category,
+  price
+FROM products;
+EXPLAIN
+SELECT
+  category,
+  price
+FROM products
+GROUP BY category, price;
+UPDATE products
+SET price = -5
+WHERE product_id = 101;
+INSERT INTO customers (customer_id, email, phone_number)
+VALUES (999, 'anna@example.com', '091000999');
+CREATE TABLE IF NOT EXISTS sales_analysis AS
+SELECT
+    s.transaction_id,
+
+    o.order_date,
+    DATE(o.order_date) AS order_date_date,
+    o.year,
+    o.quarter,
+    o.month,
+
+    c.customer_name,
+    c.city,
+    c.zip_code,
+
+    p.product_name,
+    p.category,
+    p.price,
+
+    e.first_name  AS employee_first_name,
+    e.last_name   AS employee_last_name,
+    e.salary      AS employee_salary,
+
+    s.quantity,
+    s.discount,
+    s.total_sales
+
+FROM sales AS s
+JOIN orders AS o
+    ON s.order_id = o.order_id
+JOIN customers AS c
+    ON s.customer_id = c.customer_id
+JOIN products AS p
+    ON s.product_id = p.product_id
+LEFT JOIN employees AS e
+    ON s.employee_id = e.employee_id;
+CREATE INDEX idx_sales_analysis_order_date
+    ON sales_analysis(order_date_date);
+
+CREATE INDEX idx_sales_analysis_year
+    ON sales_analysis(year);
+
+CREATE INDEX idx_sales_analysis_city
+    ON sales_analysis(city);
+
+CREATE INDEX idx_sales_analysis_category
+    ON sales_analysis(category);	
+SELECT
+    transaction_id,
+    order_date_date,
+    product_name,
+    total_sales
+FROM sales_analysis
+WHERE total_sales > 1000;
+SELECT
+    transaction_id,
+    product_name,
+    category,
+    total_sales
+FROM sales_analysis
+WHERE category = 'Electronics';
+SELECT
+    transaction_id,
+    order_date_date,
+    year,
+    product_name,
+    total_sales
+FROM sales_analysis
+WHERE year = 2023
+  AND total_sales > 10000;
+SELECT
+    transaction_id,
+    order_date_date,
+    city,
+    total_sales
+FROM sales_analysis
+WHERE city = 'East Amanda'
+   OR city = 'Smithside';
+SELECT
+    transaction_id,
+    city,
+    total_sales
+FROM sales_analysis
+WHERE city IN ('East Amanda', 'Smithside', 'Lake Thomas');  
+SELECT
+    transaction_id,
+    product_name,
+    category,
+    total_sales
+FROM sales_analysis
+WHERE product_name LIKE 'E%';
+SELECT
+    category,
+    SUM(total_sales) AS total_sales_amount
+FROM sales_analysis
+WHERE year = 2023
+GROUP BY category
+HAVING SUM(total_sales) > 500000
+ORDER BY total_sales_amount DESC;
+SELECT
+    product_name,
+    price,
+    CASE
+        WHEN price >= 1000 THEN 'Premium'
+        WHEN price >= 500 THEN 'Mid-Range'
+        ELSE 'Budget'
+    END AS price_category
+FROM sales_analysis;
+SELECT
+	AVG(total_sales) as avg_sales
+FROM sales_analysis
+SELECT
+	customer_name,
+	CASE
+	    WHEN AVG(total_sales)>251 THEN 'Above Average'
+		WHEN AVG(total_sales)=251 THEN 'Average'
+		WHEN AVG(total_sales)<251 THEN 'Below Average'
+		ELSE 'Warning'
+	END  as segment
+   FROM sales_analysis
+   GROUP BY customer_name;
+   
+		
+
+
+
+
+
+
