@@ -16,8 +16,11 @@ services:
       timeout: 5s
       retries: 10
     volumes:
+      # Persist database data (keep your bind mount; a named volume also works)
       - ./postgres_data:/var/lib/postgresql/data
+      # Run these once on first initialization
       - ./init:/docker-entrypoint-initdb.d
+      # Make CSVs available to COPY during init (read-only)
       - ./data:/docker-entrypoint-initdb.d/data:ro
 
   pgadmin:
@@ -32,5 +35,6 @@ services:
       - "5050:80"
     volumes:
       - ./pgadmin_data:/var/lib/pgadmin
+      - ./queries:/var/lib/pgadmin/storage/admin_admin.com/queries
     depends_on:
       - db
