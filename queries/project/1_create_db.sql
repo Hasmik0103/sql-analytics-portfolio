@@ -1,0 +1,1 @@
+CREATE DATABASE world_university_survey;
