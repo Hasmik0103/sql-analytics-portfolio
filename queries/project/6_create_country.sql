@@ -5,8 +5,17 @@ CREATE TABLE analytics._stg_world_countries (
     country_code TEXT NOT NULL,
     geom geometry(MULTIPOLYGON, 4326) NOT NULL
 );
+INSERT INTO analytics.country (country_name, geom)
+SELECT
+  DISTINCT
+  a. student_country,
+  b. geom
+FROM analytics._stg_world_university_survey a
+LEFT JOIN analytics._stg_world_university_survey b on (a.student_country=b.country_name)
+WHERE student_country IS NOT NULL;
 
-INSERT INTO analytics._stg_world_countries (country_name, country_code, geom)
+
+INSERT INTO analytics._stg_world_countries (country_name,country_code, geom)
 SELECT
     feature->'properties'->>'name' AS country_name,
     feature->>'id' AS country_code,
