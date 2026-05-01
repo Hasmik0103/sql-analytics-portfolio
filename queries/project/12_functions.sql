@@ -52,3 +52,24 @@ SELECT
 FROM analytics._stg_world_university_survey
 GROUP BY overall_satisfaction
 ORDER BY total_students DESC;
+
+
+
+
+
+SELECT 
+    online_classes,
+    overall_satisfaction,
+    COUNT(*) AS total_students,
+    ROUND(
+        COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (PARTITION BY online_classes),
+        2
+    ) AS percentage
+FROM analytics._stg_world_university_survey
+GROUP BY online_classes, overall_satisfaction
+ORDER BY online_classes, percentage DESC;
+
+
+
+
+
