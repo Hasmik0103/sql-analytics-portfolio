@@ -1,12 +1,15 @@
 SELECT   *
 FROM analytics._stg_world_university_survey;
 
+
+
+-- GROUP BY AGE GROUP
 SELECT
 	MIN(age),
 	MAX(age)
 FROM analytics._stg_world_university_survey;	
 	
--- GROUP BY AGE GROUP
+
 
 
 
@@ -62,8 +65,7 @@ SELECT
     overall_satisfaction,
     COUNT(*) AS total_students,
     ROUND(
-        COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (PARTITION BY online_classes),
-        2
+        COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (PARTITION BY online_classes),2
     ) AS percentage
 FROM analytics._stg_world_university_survey
 GROUP BY online_classes, overall_satisfaction
