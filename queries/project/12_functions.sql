@@ -79,7 +79,8 @@ SELECT
   country,
   COUNT(*) AS total_students
 FROM analytics._stg_world_university_survey
-GROUP BY country;
+GROUP BY country
+ORDER BY country DESC;
 
 
 -- GROUP BY university
