@@ -74,4 +74,21 @@ ORDER BY online_classes, percentage DESC;
 
 
 
+-- GROUP BY country
+SELECT 
+  country,
+  COUNT(*) AS total_students
+FROM analytics._stg_world_university_survey
+GROUP BY country;
+
+
+-- GROUP BY university
+SELECT 
+ university,
+  COUNT(*) AS total_students
+FROM analytics._stg_world_university_survey
+GROUP BY university;
+
+
+
 
